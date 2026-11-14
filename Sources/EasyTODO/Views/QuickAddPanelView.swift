@@ -1,10 +1,13 @@
 import AppKit
 import SwiftUI
 
+@MainActor
 struct QuickAddPanelView: View {
+    @ObservedObject var categoryStore = TaskCategoryStore.shared
+    @State private var categoryID: UUID?
     static let cornerRadius: CGFloat = 22
 
-    var onSubmit: (String) -> Void
+    var onSubmit: (String, UUID?) -> Void
     var onCancel: () -> Void
 
     @State private var title = ""
@@ -20,17 +23,14 @@ struct QuickAddPanelView: View {
                     .frame(width: 28, height: 28)
             }
 
-            Image(systemName: "plus")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .frame(width: 28, height: 28)
+            CategoryPicker(store: categoryStore, selection: $categoryID, onSelection: { isFocused = true })
 
             TextField("Quick add a task...", text: $title)
                 .textFieldStyle(.plain)
                 .font(.system(size: 20, weight: .medium))
                 .focused($isFocused)
                 .onSubmit {
-                    onSubmit(title)
+                    onSubmit(title, categoryStore.validCategoryID(categoryID))
                 }
 
             Text("Return")

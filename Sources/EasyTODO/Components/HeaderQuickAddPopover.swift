@@ -1,18 +1,19 @@
-@preconcurrency import AppKit
+import AppKit
 import SwiftUI
 
+@MainActor
 struct HeaderQuickAddPopover: View {
+    @ObservedObject var categoryStore = TaskCategoryStore.shared
+    @State private var categoryID: UUID?
     @State private var title = ""
     @State private var focusRequest = 0
 
-    var onSubmit: (String) -> Bool
+    var onSubmit: (String, UUID?) -> Bool
     var onCancel: () -> Void
 
     var body: some View {
         HStack(spacing: 9) {
-            Image(systemName: "plus")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.secondary)
+            CategoryPicker(store: categoryStore, selection: $categoryID, onSelection: focusInput)
 
             QuickAddTaskTextField(
                 text: $title,
@@ -29,12 +30,12 @@ struct HeaderQuickAddPopover: View {
         }
         .padding(.horizontal, 13)
         .padding(.vertical, 10)
-        .frame(width: 286)
+        .frame(width: 320)
         .onAppear(perform: focusInput)
     }
 
     private func submitTitle() {
-        guard onSubmit(title) else {
+        guard onSubmit(title, categoryStore.validCategoryID(categoryID)) else {
             focusInput()
             return
         }

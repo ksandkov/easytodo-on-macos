@@ -7,7 +7,9 @@ enum TaskCreation {
         title: String,
         scheduledDate: Date = .now,
         in context: ModelContext,
-        calendar: Calendar = .current
+        calendar: Calendar = .current,
+        categoryID: UUID? = nil,
+        categoryStore: TaskCategoryStore? = nil
     ) throws -> TodoTask? {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedTitle.isEmpty else { return nil }
@@ -21,6 +23,9 @@ enum TaskCreation {
 
         context.insert(task)
         try context.save()
+        if let categoryID {
+            (categoryStore ?? .shared).assign(categoryID, to: task)
+        }
 
         return task
     }

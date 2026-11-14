@@ -12,6 +12,10 @@ final class MenuBarManager: NSObject {
     private var refreshTimer: Timer?
     private var defaultsObserver: NSObjectProtocol?
     private var pendingSingleClick: DispatchWorkItem?
+    private lazy var lifecycle = MenuBarLifecycle(
+        onInstall: { [weak self] in self?.installStatusItem() },
+        onRemove: { [weak self] in self?.removeStatusItem() }
+    )
 
     private override init() {
         super.init()
@@ -21,6 +25,11 @@ final class MenuBarManager: NSObject {
         self.modelContainer = modelContainer
         observeSettings()
         syncVisibility()
+    }
+
+    func applicationDidFinishLaunching() {
+        syncVisibility()
+        lifecycle.applicationDidFinishLaunching()
     }
 
     func closePopover() {
@@ -37,7 +46,7 @@ final class MenuBarManager: NSObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.syncVisibility()
                 self?.refreshStatusTitle()
             }
@@ -45,11 +54,9 @@ final class MenuBarManager: NSObject {
     }
 
     private func syncVisibility() {
-        if UserDefaults.standard.bool(forKey: EasyTODOSettings.showMenuBar) {
-            installStatusItem()
-        } else {
-            removeStatusItem()
-        }
+        lifecycle.setEnabled(
+            modelContainer != nil && UserDefaults.standard.bool(forKey: EasyTODOSettings.showMenuBar)
+        )
     }
 
     private func installStatusItem() {
@@ -123,6 +130,10 @@ final class MenuBarManager: NSObject {
         showItem.target = self
         menu.addItem(showItem)
 
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(showSettingsFromMenu(_:)), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+
         menu.addItem(.separator())
 
         let quitItem = NSMenuItem(title: "Quit", action: #selector(quitFromMenu(_:)), keyEquivalent: "")
@@ -137,6 +148,10 @@ final class MenuBarManager: NSObject {
     @objc private func showFromMenu(_ sender: NSMenuItem) {
         popover?.performClose(nil)
         WindowManager.shared.showMainWindow()
+    }
+
+    @objc private func showSettingsFromMenu(_ sender: NSMenuItem) {
+        SettingsWindowManager.shared.showSettings()
     }
 
     @objc private func quitFromMenu(_ sender: NSMenuItem) {
@@ -193,7 +208,7 @@ final class MenuBarManager: NSObject {
         guard refreshTimer == nil else { return }
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.refreshStatusTitle()
             }
         }

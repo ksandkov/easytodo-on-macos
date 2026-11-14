@@ -2,8 +2,8 @@ import SwiftData
 import XCTest
 @testable import EasyTODO
 
-@MainActor
 final class EasyTODOTests: XCTestCase {
+    @MainActor
     func testTaskDefaultsToIncomplete() {
         let task = TodoTask(title: "Read paper", sortOrder: 2)
 
@@ -14,6 +14,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertTrue(task.isScheduled(on: .now))
     }
 
+    @MainActor
     func testTaskScheduledDateIsStoredAsStartOfDay() throws {
         let calendar = Calendar.current
         let futureDate = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 12, day: 18, hour: 15)))
@@ -25,6 +26,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertTrue(task.isScheduled(on: expectedDay, calendar: calendar))
     }
 
+    @MainActor
     func testTaskCanStorePriority() {
         let task = TodoTask(title: "Finish report", priority: .importantUrgent)
 
@@ -35,6 +37,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(task.priority, .notUrgentImportant)
     }
 
+    @MainActor
     func testTaskCanStoreRepeatRule() {
         let task = TodoTask(title: "Standup", repeatRule: .daily)
 
@@ -45,6 +48,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(task.repeatRule, .weekly)
     }
 
+    @MainActor
     func testLegacyPriorityValuesAreMapped() {
         XCTAssertEqual(TaskPriority.normalized(from: "urgent"), .importantUrgent)
         XCTAssertEqual(TaskPriority.normalized(from: "high"), .notUrgentImportant)
@@ -52,6 +56,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(TaskPriority.normalized(from: nil), .notUrgentImportant)
     }
 
+    @MainActor
     func testInMemoryContainerPersistsInsertedTask() throws {
         let container = try PersistenceController.modelContainer(inMemory: true)
         let context = container.mainContext
@@ -66,6 +71,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(tasks.first?.title, "Reply email")
     }
 
+    @MainActor
     func testCanAddMultipleTasksInARow() throws {
         let calendar = Calendar.current
         let today = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 9)))
@@ -86,6 +92,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(todayTasks.map(\.sortOrder), [0, 1, 2])
     }
 
+    @MainActor
     func testBlankTaskTitleDoesNotInterruptLaterAdds() throws {
         let calendar = Calendar.current
         let today = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 9)))
@@ -103,6 +110,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(tasks.first?.sortOrder, 0)
     }
 
+    @MainActor
     func testTasksAreOrderedByPriorityThenAddOrder() {
         let firstGreen = TodoTask(title: "First green", sortOrder: 0, priority: .notUrgentImportant)
         let red = TodoTask(title: "Red", sortOrder: 1, priority: .importantUrgent)
@@ -115,6 +123,7 @@ final class EasyTODOTests: XCTestCase {
         )
     }
 
+    @MainActor
     func testTaskCanMoveToAnotherDate() throws {
         let calendar = Calendar.current
         let today = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 9)))
@@ -128,6 +137,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(task.sortOrder, 1)
     }
 
+    @MainActor
     func testDailyRepeatCreatesUpcomingOccurrences() throws {
         let calendar = Calendar.current
         let today = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 9)))
@@ -145,6 +155,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertEqual(tasks.filter { $0.isScheduled(on: tomorrow, calendar: calendar) }.count, 1)
     }
 
+    @MainActor
     func testNewlyCompletedTaskMovesToFrontOfCompletedTasks() {
         let first = TodoTask(title: "Read paper", sortOrder: 0)
         let second = TodoTask(title: "Reply email", sortOrder: 1)
@@ -163,15 +174,10 @@ final class EasyTODOTests: XCTestCase {
         )
     }
 
+    @MainActor
     func testPersistentContainerReopensSavedTask() throws {
-        let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("EasyTODOTests-\(UUID().uuidString)", isDirectory: true)
+        let directory = try makePersistentStoreTestDirectory()
         let storeURL = directory.appendingPathComponent("EasyTODO.store")
-
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        defer {
-            try? FileManager.default.removeItem(at: directory)
-        }
 
         do {
             let container = try PersistenceController.modelContainer(storeURL: storeURL)
@@ -189,18 +195,13 @@ final class EasyTODOTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testPersistentContainerReopensSavedFutureTaskDate() throws {
         let calendar = Calendar.current
         let futureDate = try XCTUnwrap(calendar.date(from: DateComponents(year: 2027, month: 1, day: 9, hour: 9)))
         let expectedDay = calendar.startOfDay(for: futureDate)
-        let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("EasyTODOTests-\(UUID().uuidString)", isDirectory: true)
+        let directory = try makePersistentStoreTestDirectory()
         let storeURL = directory.appendingPathComponent("EasyTODO.store")
-
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        defer {
-            try? FileManager.default.removeItem(at: directory)
-        }
 
         do {
             let container = try PersistenceController.modelContainer(storeURL: storeURL)
@@ -219,6 +220,7 @@ final class EasyTODOTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testUnfinishedPastTasksRollOverToToday() throws {
         let calendar = Calendar.current
         let today = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 9)))
@@ -239,6 +241,7 @@ final class EasyTODOTests: XCTestCase {
         XCTAssertTrue(completedPastTask.isScheduled(on: yesterday, calendar: calendar))
     }
 
+    @MainActor
     func testTodayAndFutureTasksDoNotRollOver() throws {
         let calendar = Calendar.current
         let today = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 9)))

@@ -1,224 +1,149 @@
 <div align="center">
-
   <img src="logo/logo.png" alt="EasyTODO logo" width="96" />
-  <h1>EasyTODO: The simplest free TODO list for macOS.</h1>
-  <h2><strong>Simple. Free. Always on your desktop. MacOS 14 or above.</strong></h2>
-  <p>
-    <a href="https://github.com/ArabelaTso/easytodo-on-macos/releases/latest"><img alt="Download latest DMG" src="https://img.shields.io/badge/download-macOS%20DMG-2da44e?style=for-the-badge&logo=github&logoColor=white" /></a>
-    <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-111827?style=for-the-badge&logo=apple&logoColor=white" />
-    <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&logo=swift&logoColor=white" />
-    <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-native-0A84FF?style=for-the-badge" />
-    <img alt="Local first" src="https://img.shields.io/badge/local--first-no%20cloud-2EA44F?style=for-the-badge" />
-    <img alt="License" src="https://img.shields.io/badge/license-MIT-6E7781?style=for-the-badge" />
-  </p>
-  <p>
-    <a href="https://www.producthunt.com/products/github-469?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-github-111cb834-3990-44a2-b502-38317a735e1a" target="_blank" rel="noopener noreferrer"><img alt="GitHub - todo-list widget on MacOS desktop and menu bar | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1219356&amp;theme=light&amp;t=1786357788671"></a>
-  </p>
-
+  <h1>EasyTODO for macOS</h1>
+  <p>A lightweight desktop task list with configurable categories and a compact window.</p>
+  <p>macOS 14+ · SwiftUI · SwiftData · Local storage · MIT</p>
 </div>
 
-EasyTODO is a native macOS desktop todo app designed to stay visible, feel lightweight, and make capture fast. It removes the tedious setup common in task apps: no workspace setup, no cloud account, no project-management ceremony. Just today's tasks, always close at hand.
+This is a fork of [ArabelaTso/easytodo-on-macos](https://github.com/ArabelaTso/easytodo-on-macos), maintained by [ksandkov](https://github.com/ksandkov). It focuses on reliable macOS 14 behavior, a clean desktop card, and named task categories while preserving the original app's local-first approach.
 
-![EasyTODO feature demo](docs/assets/hero-demo.gif)
+**No fork-specific binary release has been published yet.** Build from source or use the backed-up local preview below. Upstream releases do not include this fork's changes.
 
-## Download
+## What's Different
 
-[Download the latest macOS DMG](https://github.com/ArabelaTso/easytodo-on-macos/releases/latest)
+- **Reliable startup on macOS 14:** menu bar setup waits until AppKit finishes launching.
+- **Inline editing:** double-click a task title; Return saves and Escape cancels.
+- **Configurable categories:** add categories, rename them, and choose their colors in **Settings → Categories**. Defaults are **Work**, **Important**, and **Home**.
+- **Visible category selection:** click a task's color strip to open a named palette. Every task input has a category circle, including calendar, menu bar, and global Quick Add.
+- **Clean desktop card:** larger task text, subtle checkboxes, visible trash buttons with confirmation, and a separate bottom **+ Add Task** section.
+- **One compact window:** double-click the header to collapse or expand; no separate widget window. Calendar, settings, progress, and add controls remain in the header.
+- **Persistent geometry:** window size, position, and compact state survive relaunch. Expanded height can be reduced to 180 points; tasks scroll when space is limited.
+- **Independent visibility:** Dock and menu bar icons can each be hidden without forcing the other to remain visible. The window gear and context menu still provide settings access.
 
-- Requires macOS 14 or later.
-- Download `EasyTODO-*-macOS-arm64.dmg`, open it, then drag `EasyTODO.app` to `Applications`.
-- If macOS blocks the first launch, right-click `EasyTODO.app` and choose `Open`.
+Calendar planning, task reordering, date moves, repeat scheduling, completion feedback, transparency, and launch-at-login settings are retained from the original app.
 
-## Why EasyTODO
+## Requirements
 
-Most todo apps make a simple thought feel like admin work: open a tab, pick a workspace, choose a project, fill metadata, then find the list again later. **EasyTODO is built to remove that friction**. It behaves like a polished desktop note that can float above your work, save locally, and accept new tasks without breaking your flow.
+- macOS 14 or later.
+- Xcode 15.4 / Swift 5.10, or a compatible newer toolchain.
+- No third-party package dependencies.
 
-- **Desktop-first:** keep your list visible in a compact floating window or smaller desktop widget.
-- **Fast capture:** add tasks from the bottom row, header popover, or global Quick Add.
-- **Local-first:** SwiftData persists tasks on your Mac automatically.
-- **Low friction:** fewer steps to capture, prioritize, complete, and review tasks.
-- **Native macOS feel:** SwiftUI, AppKit window behavior, materials, and keyboard shortcuts.
-
-## Features
-
-### Shortcut Key
-
-![Global shortcut demo](docs/assets/global-shortcut-demo.gif)
-
-- Press `Command + "+"` from any app to open a translucent Quick Add input on the current screen.
-- Type a task and press `Return`; EasyTODO saves it to today's list without switching context.
-- Use the top-right `+` or bottom `Add Task` row when you are already in the main window.
-- Press `Esc` or click outside Quick Add to dismiss it; if the shortcut is unavailable, EasyTODO falls back to `Option + Command + N`.
-
-![Quick Add demo](docs/assets/quick-add-demo.gif)
-
-### Organize, Prioritize, Complete
-
-- Add, complete, delete, reorder, restore, and double-click to edit tasks inline.
-- Completed tasks are separated from active tasks; newly completed tasks move to the top of the completed group.
-- Completion plays a system sound and shows a small fireworks effect.
-- Tasks use four clean priority colors while keeping the left row color strip visible.
-
-| Color | Meaning |
-| --- | --- |
-| Red | Important and urgent |
-| Yellow | Urgent but not important |
-| Green | Important but not urgent |
-| Gray | Neither urgent nor important |
-
-New tasks default to green. The UI shows a single color dot picker instead of written priority names.
-
-### Menu Bar And Widget
-
-![Menu Bar demo](docs/assets/menu-bar-demo.gif)
-
-- Show today's progress in the macOS menu bar, such as `2 / 5`, and open a compact task popover.
-- Toggle completion directly from the menu bar popover without opening the full app.
-- Open a draggable desktop widget from the app menu, menu bar popover, or main window context menu.
-- The widget floats above the desktop, joins all Spaces, shows active/done counts, and opens the full app on double-click.
-
-### Planning, Window Control, Persistence
-
-- Click the date header to open calendar planning; legacy unscheduled tasks are normalized to today.
-- Right-click the main window to change always-on-top, transparency, or widget mode.
-- Choose 100%, 80%, or 50% transparency levels.
-- SwiftData autosaves edits, app deactivation, and termination into the user's Application Support directory.
-
-## Installation
-
-Download the latest macOS DMG from GitHub Releases:
-
-[Download EasyTODO for macOS](https://github.com/ArabelaTso/easytodo-on-macos/releases/latest)
-
-1. Download `EasyTODO-*-macOS-arm64.dmg`.
-2. Open the DMG.
-3. Drag `EasyTODO.app` into `Applications`.
-4. If macOS blocks the first launch, right-click `EasyTODO.app` and choose `Open`.
-
-Requires macOS 14 or later.
-
-## Run From Source
-
-From the repository root, build and launch the app with Swift Package Manager:
+## Build and Run
 
 ```sh
+git clone https://github.com/ksandkov/easytodo-on-macos.git
+cd easytodo-on-macos
+swift build
 swift run EasyTODO
 ```
 
-If an older debug app is already running, stop it first, then start again:
+Run only one EasyTODO build at a time. If an older source build is running, quit it normally before launching another.
+
+### Backed-up Local Preview
 
 ```sh
-ps -Ao pid,etime,command | rg 'EasyTODO|\.build/.*/EasyTODO'
-kill <pid>
-swift run EasyTODO
+bash scripts/preview_app.sh
 ```
 
-## Usage
+The script builds and tests the app, asks an existing EasyTODO process to quit normally, backs up task data and preferences to `dist/data-backup-*`, packages a debug app, and opens `dist/EasyTODO.app`. It does **not** replace `/Applications/EasyTODO.app`. Build output is saved to `dist/preview-build.log`.
 
-1. Launch EasyTODO from `Applications`.
-2. Add a task from the bottom `Add Task` row, the top-right `+`, or global Quick Add.
-3. Use the color dot to set priority.
-4. Check a task to complete it; EasyTODO plays a sound and shows a small celebration.
-5. Open the desktop widget from the app menu, menu bar popover, or main window context menu when you want a smaller view.
-6. Right-click the window to change always-on-top, transparency, or widget mode.
-7. Open Settings to manage launch, menu bar, visibility, transparency, and theme.
+**The preview and original app share the bundle identifier `com.easytodo.EasyTODO`, task store, and preferences. They are not independent installations.** Keep the backup before switching builds. This fork does not change the SwiftData task schema.
 
-## Keyboard Shortcuts
+## Everyday Use
+
+- Add a task with the header **+**, bottom **+ Add Task**, or global Quick Add. Choose a category using the input's colored circle before pressing Return.
+- Click an existing task's left color strip to change its category, or choose **No category** for neutral gray.
+- Open **Settings → Categories** to add, rename, recolor, or delete categories. Category changes update linked tasks; deleting a category never deletes its tasks.
+- Existing tasks are not automatically assigned to the new categories. Categories do not change task ordering; legacy priority values are preserved internally.
+- Generated repeat occurrences inherit the source task's category. Undoing task deletion restores its category if that category still exists.
+- Check a task to complete it, drag to reorder it, double-click its title to edit it, and use the trash button to delete with confirmation.
+- Double-click the header to toggle compact mode. Drag the window and resize it normally; its geometry is remembered.
+- Use the calendar button for planning. Right-click tasks for edit, category, delete, move-date, and repeat actions where available.
+- Open Settings with the gear, the window context menu, or the menu bar context menu. General settings and category management have separate panes to keep the window compact.
+
+An unchanged older default category set is translated to English while preserving category identities and task assignments. Customized category catalogs are left untouched.
+
+### Keyboard Shortcuts
 
 | Shortcut | Action |
 | --- | --- |
 | `Command + +` | Global Quick Add |
 | `Option + Command + N` | Fallback global Quick Add |
-| `Command + N` | Focus new task entry |
-| `Control + Z` | Undo last deleted task |
-| `Return` | Save active quick input |
-| `Esc` | Dismiss active quick input |
+| `Command + N` | Focus a new task input |
+| `Control + Z` | Undo the last task deletion in the main window |
+| `Command + ,` | Open Settings when the app menu is available |
+| `Return` | Save a task input, title edit, or category name edit |
+| `Esc` | Cancel a title edit or dismiss quick input |
 
-## Settings
+### General Settings
 
-| Setting | Options |
-| --- | --- |
-| Launch at Login | On / Off |
-| Always on Top | On / Off |
-| Show in Menu Bar | On / Off |
-| Hide Dock Icon | On / Off when menu bar is enabled |
-| Transparency | 100%, 80%, 50% |
-| Theme | Light, Dark |
+- Launch at Login and Always on Top.
+- **Hide Menu Bar Icon** and **Hide Dock Icon**, independently. Turning either setting on hides that icon.
+- Window transparency: 100%, 80%, or 50%.
+- Light or dark theme.
+
+Both icons can be hidden. If the main window is also hidden, reopen the same app build to restore it. Quit remains available in the main window's context menu. Third-party menu bar utilities may hide or relocate the status item independently of these settings.
+
+## Data and Backups
+
+Tasks use SwiftData in the user's Application Support directory. Category definitions and task assignments are stored separately in application preferences, together with window and display settings.
+
+**Back up preferences together with the task store.** Copying only the task database does not include category assignments. The local preview script backs up both, including legacy store locations and SQLite sidecars when present. Backups may contain personal task data; do not commit or publish `dist/`.
+
+The app does not require an account or cloud service.
+
+## Verification
+
+```sh
+swift build
+swift test
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts/tests -q
+bash -n scripts/*.sh
+git diff --check
+```
+
+Run tests on macOS; native window tests require a desktop session. Coverage includes task creation and persistence, category migration and assignment, recurrence, deletion undo, native text input, palette selection, compact windows, saved geometry, and menu bar lifecycle.
+
+## Packaging
+
+```sh
+bash scripts/package_app.sh
+bash scripts/package_dmg.sh
+```
+
+These produce local app, ZIP, and DMG artifacts in `dist/`. Set `VERSION` and `BUILD_NUMBER` when preparing a release. Packaging uses the current machine's architecture. Builds are ad-hoc signed, not notarized; macOS may require an explicit first-launch confirmation. Packaging alone does not install the app or publish a release.
+
+The release workflow runs only for a version tag or a manual dispatch. Do not treat an upstream release as a release of this fork.
 
 ## Project Structure
 
 ```text
 Sources/EasyTODO/
-├── App/                 # App entry, settings keys, notifications
-├── Components/          # Reusable UI pieces and visual effects
-├── Managers/            # AppKit integration: windows, shortcuts, menu bar, login
-├── Models/              # SwiftData models and task ordering
-├── Persistence/         # SwiftData container setup and store migration
-├── Resources/           # Bundled app logo
-└── Views/               # Main list, task row, quick add, calendar, settings
-Tests/EasyTODOTests/     # XCTest coverage
+├── App/           # App entry and shared settings
+├── Components/    # Task controls, category palette, input, and effects
+├── Managers/      # Windows, menu bar, shortcuts, and category preferences
+├── Models/        # SwiftData task model, categories, ordering, and scheduling
+├── Persistence/   # Model container and existing store handling
+├── Resources/     # App logo
+└── Views/         # Task list, calendar, quick add, and settings
+Tests/EasyTODOTests/
+scripts/           # Preview, packaging, and script tests
 ```
-
-## Technology
-
-| Area | Implementation |
-| --- | --- |
-| UI | SwiftUI |
-| Persistence | SwiftData |
-| Settings | AppStorage / UserDefaults |
-| Window behavior | AppKit NSWindow / NSPanel |
-| Menu bar | AppKit status item and popover |
-| Desktop widget | Borderless AppKit NSPanel with SwiftUI content |
-| Global shortcut | Carbon hot key registration |
-| Login item | ServiceManagement |
 
 ## Release Notes
 
-Reverse chronological history, based on Git commits.
+### Unreleased — Desktop and Category Customization
 
-| Commit | Tag | Notes |
-| --- | --- | --- |
-| `v1.0.4` | ![release](https://img.shields.io/badge/-release-8250df?style=flat-square) | Added a widget right-click transparency slider and deepened the fully opaque widget surface. |
-| `v1.0.3` | ![release](https://img.shields.io/badge/-release-8250df?style=flat-square) | Added task context editing, priority sorting, date moves, repeat scheduling, and the agent restart rule. |
-| `v1.0.2` | ![release](https://img.shields.io/badge/-release-8250df?style=flat-square) | Added the Product Hunt badge and long-task floating text previews on hover. |
-| `v1.0.1` | ![release](https://img.shields.io/badge/-release-8250df?style=flat-square) | Added menu bar quick add, delete confirmation, scrollable menu bar tasks, source launch docs, and transparent Quick Add corners. |
-| `v1.0.0` | ![release](https://img.shields.io/badge/-release-8250df?style=flat-square) | Prepared the 1.0.0 release with refreshed quick add, widget scrolling, daily rollover, and title editing fixes. |
-| `67d0e54` | ![release](https://img.shields.io/badge/-release-8250df?style=flat-square) | Added macOS app packaging, DMG generation, and GitHub release automation. |
-| `1f5150d` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added compact desktop widget mode. |
-| `a321623` | ![docs](https://img.shields.io/badge/-docs-0969da?style=flat-square) | Updated the README product guide. |
-| `b4d7de0` | ![ui](https://img.shields.io/badge/-ui-bc4c00?style=flat-square) | Updated transparency options. |
-| `e239fe9` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added menu bar context actions. |
-| `2ff65a7` | ![fix](https://img.shields.io/badge/-fix-c93c37?style=flat-square) | Fixed focus behavior for the bottom Add Task row. |
-| `02fca2f` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added the top-right header quick task input. |
-| `a7dca6a` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added inline task title editing. |
-| `51d441e` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added context controls for window behavior and delete undo. |
-| `4e30bdc` | ![ui](https://img.shields.io/badge/-ui-bc4c00?style=flat-square) | Removed the System theme option; kept Light and Dark. |
-| `d2593de` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added the global Quick Add panel. |
-| `f2fca4a` | ![ui](https://img.shields.io/badge/-ui-bc4c00?style=flat-square) | Moved window controls into a context menu. |
-| `944662e` | ![ui](https://img.shields.io/badge/-ui-bc4c00?style=flat-square) | Removed the main window titlebar for a cleaner note shape. |
-| `e58169e` | ![ui](https://img.shields.io/badge/-ui-bc4c00?style=flat-square) | Polished the window background and app icon. |
-| `2921750` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added calendar-based task scheduling. |
-| `d436ba5` | ![chore](https://img.shields.io/badge/-chore-6e7781?style=flat-square) | Renamed the app to EasyTODO. |
-| `0e43f20` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Ordered completed tasks by completion sequence. |
-| `5b28279` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Added completion sound and visual feedback effects. |
-| `1d1d063` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Improved note-style window behavior and local persistence. |
-| `992cd8f` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Refined the priority color picker. |
-| `c86d54d` | ![feature](https://img.shields.io/badge/-feature-2da44e?style=flat-square) | Implemented the first native desktop todo app. |
-| `fdd9267` | ![docs](https://img.shields.io/badge/-docs-0969da?style=flat-square) | Reformulated README into a structured product document. |
-| `5bd2978` | ![docs](https://img.shields.io/badge/-docs-0969da?style=flat-square) | Added the first README introduction. |
-| `1eb8947` | ![chore](https://img.shields.io/badge/-chore-6e7781?style=flat-square) | Initial repository setup. |
+- Fix macOS 14 startup and borderless-window keyboard focus.
+- Add named, configurable categories and category selection in every task input.
+- Preserve category identity through rename, recolor, recurrence, deletion undo, and the English-default migration.
+- Replace the separate widget with one persistent, collapsible desktop window.
+- Refine the card layout, restore visible trash buttons, and separate the bottom add section.
+- Keep Dock and menu bar visibility independent; retain settings access with both hidden.
+- Add a backed-up preview workflow and regression coverage without changing the task-store schema.
 
-## Contributing
+For the original release history, see the [upstream releases](https://github.com/ArabelaTso/easytodo-on-macos/releases).
 
-Contributions are welcome. Keep changes focused and native to macOS.
+## Credits and License
 
-```sh
-swift build
-swift test
-```
-
-For UI changes, include a screenshot or short GIF. For persistence, ordering, or model changes, add or update XCTest coverage.
-
-## License
-
-This project is licensed under the terms in [LICENSE](LICENSE).
+Original EasyTODO app, branding, and bundled assets by [ArabelaTso](https://github.com/ArabelaTso). This fork retains the upstream copyright and [MIT license](LICENSE).

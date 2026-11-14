@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct NoteWindowControls: View {
     @State private var hoveredAction: WindowControlAction?
 

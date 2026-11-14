@@ -23,8 +23,12 @@ enum TaskRepeatScheduler {
         for task: TodoTask,
         tasks: [TodoTask],
         in context: ModelContext,
-        calendar: Calendar = .current
+        calendar: Calendar = .current,
+        categoryStore: TaskCategoryStore? = nil
     ) throws {
+        let categoryStore = categoryStore ?? .shared
+        let categoryID = categoryStore.categoryID(for: task)
+        var occurrences: [TodoTask] = []
         task.repeatRule = repeatRule
 
         guard repeatRule != .none else {
@@ -50,9 +54,13 @@ enum TaskRepeatScheduler {
                 recurrenceGroupID: groupID
             )
             context.insert(occurrence)
+            occurrences.append(occurrence)
         }
 
         try context.save()
+        for occurrence in occurrences {
+            categoryStore.assign(categoryID, to: occurrence)
+        }
     }
 
     private static func occurrenceDates(for repeatRule: TaskRepeatRule, after date: Date, calendar: Calendar) -> [Date] {

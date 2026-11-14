@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+@MainActor
 struct MenuBarTodoView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: [
@@ -9,6 +10,7 @@ struct MenuBarTodoView: View {
         SortDescriptor(\TodoTask.createdAt)
     ]) private var tasks: [TodoTask]
 
+    @ObservedObject private var categoryStore = TaskCategoryStore.shared
     @State private var isQuickAddPresented = false
     @State private var taskPendingDeletion: TodoTask?
 
@@ -81,9 +83,9 @@ struct MenuBarTodoView: View {
             HStack(spacing: 8) {
                 Button {
                     MenuBarManager.shared.closePopover()
-                    WidgetWindowManager.shared.toggleWidget()
+                    SettingsWindowManager.shared.showSettings()
                 } label: {
-                    Label("Widget", systemImage: "rectangle.on.rectangle")
+                    Label("Settings…", systemImage: "gearshape")
                 }
                 .buttonStyle(.bordered)
 
@@ -153,7 +155,7 @@ struct MenuBarTodoView: View {
             } label: {
                 HStack {
                     Circle()
-                        .fill(task.priority.color)
+                        .fill(categoryStore.color(for: task))
                         .frame(width: 8, height: 8)
 
                     Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
@@ -224,8 +226,11 @@ struct MenuBarTodoView: View {
     }
 
     private func delete(_ task: TodoTask) {
-        modelContext.delete(task)
-        saveChanges()
+        do {
+            _ = try DeletedTaskSnapshot.delete(task, in: modelContext, categoryStore: categoryStore)
+        } catch {
+            assertionFailure("Unable to delete menu bar task: \(error)")
+        }
     }
 
     private func showQuickAdd() {
@@ -236,9 +241,9 @@ struct MenuBarTodoView: View {
         isQuickAddPresented = false
     }
 
-    private func addTask(title: String) -> Bool {
+    private func addTask(title: String, categoryID: UUID?) -> Bool {
         do {
-            return try TaskCreation.addTask(title: title, in: modelContext, calendar: calendar) != nil
+            return try TaskCreation.addTask(title: title, in: modelContext, calendar: calendar, categoryID: categoryID, categoryStore: categoryStore) != nil
         } catch {
             assertionFailure("Unable to save menu bar task: \(error)")
             return false

@@ -9,12 +9,14 @@ private enum CalendarPerspective: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+@MainActor
 struct CalendarPlannerView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var categoryStore = TaskCategoryStore.shared
 
     let tasks: [TodoTask]
     @Binding var selectedDate: Date
-    var onAddTask: (_ title: String, _ date: Date) -> Void
+    var onAddTask: (_ title: String, _ date: Date, _ categoryID: UUID?) -> Void
     var onUpdate: () -> Void
     var onCompletionChanged: (_ task: TodoTask, _ oldValue: Bool, _ newValue: Bool) -> Void
     var onDelete: (_ task: TodoTask) -> Void
@@ -23,6 +25,7 @@ struct CalendarPlannerView: View {
     @State private var perspective: CalendarPerspective = .month
     @State private var visibleMonth = Date()
     @State private var newTaskTitle = ""
+    @State private var newTaskCategoryID: UUID?
     @FocusState private var isAddingTaskFocused: Bool
 
     private let calendar = Calendar.current
@@ -182,6 +185,7 @@ struct CalendarPlannerView: View {
 
             AddTaskView(
                 title: $newTaskTitle,
+                categoryID: $newTaskCategoryID,
                 focus: $isAddingTaskFocused,
                 placeholder: "Add Task for \(shortDate(for: selectedDate))",
                 onSubmit: addTaskForSelectedDate
@@ -361,7 +365,7 @@ struct CalendarPlannerView: View {
                     ForEach(tasks.prefix(2)) { task in
                         HStack(spacing: 4) {
                             Circle()
-                                .fill(task.priority.color)
+                                .fill(categoryStore.color(for: task))
                                 .frame(width: 5, height: 5)
 
                             Text(task.title.isEmpty ? "Untitled" : task.title)
@@ -446,7 +450,7 @@ struct CalendarPlannerView: View {
             return
         }
 
-        onAddTask(trimmedTitle, selectedDate)
+        onAddTask(trimmedTitle, selectedDate, categoryStore.validCategoryID(newTaskCategoryID))
         newTaskTitle = ""
         isAddingTaskFocused = true
     }

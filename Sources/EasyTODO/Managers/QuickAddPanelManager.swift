@@ -52,8 +52,8 @@ final class QuickAddPanelManager {
 
         let hostingView = TransparentQuickAddHostingView(
             rootView: QuickAddPanelView(
-                onSubmit: { [weak self] title in
-                    self?.addTask(title: title)
+                onSubmit: { [weak self] title, categoryID in
+                    self?.addTask(title: title, categoryID: categoryID)
                     self?.hideQuickAdd()
                 },
                 onCancel: { [weak self] in
@@ -77,11 +77,11 @@ final class QuickAddPanelManager {
         panel = nil
     }
 
-    private func addTask(title: String) {
+    private func addTask(title: String, categoryID: UUID?) {
         guard let modelContainer else { return }
 
         do {
-            _ = try TaskCreation.addTask(title: title, in: modelContainer.mainContext)
+            _ = try TaskCreation.addTask(title: title, in: modelContainer.mainContext, categoryID: categoryID)
         } catch {
             NSLog("EasyTODO failed to save quick add task: \(error)")
         }
@@ -103,6 +103,15 @@ final class QuickAddPanelManager {
         panel.makeKeyAndOrderFront(nil)
     }
 
+    static func isInsideQuickAdd(_ window: NSWindow?, panel: NSPanel) -> Bool {
+        var candidate = window
+        while let current = candidate {
+            if current === panel { return true }
+            candidate = current.parent
+        }
+        return false
+    }
+
     private func startDismissMonitoring(for panel: NSPanel) {
         stopDismissMonitoring()
 
@@ -111,7 +120,7 @@ final class QuickAddPanelManager {
         localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: mouseEvents) { [weak self, weak panel] event in
             guard let self, let panel else { return event }
 
-            if event.window !== panel {
+            if !Self.isInsideQuickAdd(event.window, panel: panel) {
                 Task { @MainActor in
                     self.hideQuickAdd()
                 }

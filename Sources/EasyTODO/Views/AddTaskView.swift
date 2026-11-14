@@ -1,8 +1,10 @@
 import AppKit
 import SwiftUI
 
+@MainActor
 struct AddTaskView: View {
     @Binding var title: String
+    @Binding var categoryID: UUID?
     let focus: FocusState<Bool>.Binding
     var placeholder = "Add Task"
     var onActivate: (() -> Void)?
@@ -10,10 +12,7 @@ struct AddTaskView: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: "plus")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .frame(width: 24, height: 24)
+            CategoryPicker(selection: $categoryID, onSelection: activate)
 
             TextField(placeholder, text: $title)
                 .textFieldStyle(.plain)
