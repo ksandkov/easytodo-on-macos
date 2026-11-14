@@ -7,7 +7,13 @@
 
 This is a fork of [ArabelaTso/easytodo-on-macos](https://github.com/ArabelaTso/easytodo-on-macos), maintained by [ksandkov](https://github.com/ksandkov). It focuses on reliable macOS 14 behavior, a clean desktop card, and named task categories while preserving the original app's local-first approach.
 
-**No fork-specific binary release has been published yet.** Build from source or use the backed-up local preview below. Upstream releases do not include this fork's changes.
+## Download
+
+**[Download EasyTODO v1.1.0 for Apple Silicon](https://github.com/ksandkov/easytodo-on-macos/releases/download/v1.1.0/EasyTODO-1.1.0-macOS-arm64.dmg)** · [All release files](https://github.com/ksandkov/easytodo-on-macos/releases/latest)
+
+Requires **macOS 14 or later** and an **Apple Silicon Mac**. Open the DMG and drag EasyTODO into Applications, or use the ZIP. Quit an older EasyTODO build before replacing it. These builds are ad-hoc signed, **not notarized**; if macOS blocks the first launch, use **System Settings → Privacy & Security → Open Anyway** only if you trust this download. SHA-256 checksums are included with the release.
+
+Upstream releases do not include this fork's changes. The original app and this fork share task data and preferences, so back up both before switching builds.
 
 ## What's Different
 
@@ -132,7 +138,7 @@ scripts/           # Preview, packaging, and script tests
 
 ## Release Notes
 
-### Unreleased — Desktop and Category Customization
+### v1.1.0 — Desktop and Category Customization
 
 - Fix macOS 14 startup and borderless-window keyboard focus.
 - Add named, configurable categories and category selection in every task input.
@@ -141,6 +147,10 @@ scripts/           # Preview, packaging, and script tests
 - Refine the card layout, restore visible trash buttons, and separate the bottom add section.
 - Keep Dock and menu bar visibility independent; retain settings access with both hidden.
 - Add a backed-up preview workflow and regression coverage without changing the task-store schema.
+- Package Apple Silicon DMG and ZIP downloads with the original MIT license included in the app bundle.
+- Set release and preview packaging defaults to version 1.1.0.
+- Keep resource lookup relocatable without embedding a developer-specific build path.
+- Isolate native window test preferences so repeated test runs do not inherit earlier window geometry.
 
 For the original release history, see the [upstream releases](https://github.com/ArabelaTso/easytodo-on-macos/releases).
 

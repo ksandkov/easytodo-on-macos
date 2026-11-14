@@ -3,8 +3,8 @@ set -euo pipefail
 
 APP_NAME="EasyTODO"
 BUNDLE_ID="${BUNDLE_ID:-com.easytodo.EasyTODO}"
-VERSION="${VERSION:-1.0.0}"
-BUILD_NUMBER="${BUILD_NUMBER:-1}"
+VERSION="${VERSION:-1.1.0}"
+BUILD_NUMBER="${BUILD_NUMBER:-11000}"
 CONFIGURATION="${CONFIGURATION:-release}"
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -50,6 +50,7 @@ fi
 
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 install -m 755 "$EXECUTABLE" "$MACOS_DIR/$APP_NAME"
+install -m 644 "$PROJECT_ROOT/LICENSE" "$RESOURCES_DIR/LICENSE.txt"
 
 if [[ -d "$RESOURCE_BUNDLE" ]]; then
     cp -R "$RESOURCE_BUNDLE" "$RESOURCES_DIR/"

@@ -85,7 +85,7 @@ final class WindowAccessTests: XCTestCase {
         window.makeKeyAndOrderFront(nil)
         let content = try XCTUnwrap(window.contentView)
         content.layoutSubtreeIfNeeded()
-        await Task.yield()
+        try await Task.sleep(nanoseconds: 100_000_000)
         // Deliver directly to the hosting view: XCTest cannot activate a real application window.
         // The footer label is 12 points above the bottom edge, with a 23-point line height.
         for type in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
@@ -101,9 +101,9 @@ final class WindowAccessTests: XCTestCase {
             }
         }
         try await waitForLayout {
-            NSApp.windows.contains { $0 !== window && $0.isVisible && $0.firstResponder is NSTextView }
+            NSApp.windows.contains { $0.parent === window && $0.isVisible && $0.firstResponder is NSTextView }
         }
-        let input = try XCTUnwrap(NSApp.windows.first { $0 !== window && $0.isVisible && $0.firstResponder is NSTextView })
+        let input = try XCTUnwrap(NSApp.windows.first { $0.parent === window && $0.isVisible && $0.firstResponder is NSTextView })
         defer { input.close() }
         for (characters, keyCode) in [("x", UInt16(7)), ("\r", UInt16(36))] {
             let event = try XCTUnwrap(NSEvent.keyEvent(
@@ -440,7 +440,10 @@ final class WindowAccessTests: XCTestCase {
     @MainActor
     func testHostedWindowRestoresItsHeightAfterCollapsing() async throws {
         _ = NSApplication.shared
-        let manager = WindowManager.shared
+        let suite = "EasyTODOTests.HostedGeometry.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let manager = WindowManager(defaults: defaults)
         let window = NSWindow(
             contentRect: NSRect(x: 100, y: 200, width: 340, height: 480),
             styleMask: [.borderless, .resizable],
@@ -451,7 +454,7 @@ final class WindowAccessTests: XCTestCase {
         defer { window.close() }
         manager.configureMainWindow(window)
         let container = try PersistenceController.modelContainer(inMemory: true)
-        window.contentView = NSHostingView(rootView: TodoListView().modelContainer(container))
+        window.contentView = NSHostingView(rootView: TodoListView(windowManager: manager).modelContainer(container))
 
         try await waitForLayout { abs(window.frame.height - 480) < 1 }
         let originalTop = window.frame.maxY
@@ -471,7 +474,10 @@ final class WindowAccessTests: XCTestCase {
     @MainActor
     func testHeaderDoubleClickExpandsTheCollapsedWindow() async throws {
         _ = NSApplication.shared
-        let manager = WindowManager.shared
+        let suite = "EasyTODOTests.HeaderGeometry.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let manager = WindowManager(defaults: defaults)
         let window = NSWindow(
             contentRect: NSRect(x: 100, y: 200, width: 340, height: 480),
             styleMask: [.borderless, .resizable],
@@ -484,7 +490,7 @@ final class WindowAccessTests: XCTestCase {
             window.close()
         }
         let container = try PersistenceController.modelContainer(inMemory: true)
-        window.contentView = NSHostingView(rootView: TodoListView().modelContainer(container))
+        window.contentView = NSHostingView(rootView: TodoListView(windowManager: manager).modelContainer(container))
         manager.configureMainWindow(window)
         window.makeKeyAndOrderFront(nil)
         try await waitForLayout { window.contentView?.window != nil }

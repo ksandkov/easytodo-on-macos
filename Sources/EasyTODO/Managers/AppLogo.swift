@@ -3,7 +3,8 @@ import AppKit
 enum AppLogo {
     private static let sourceImage: NSImage? = {
         let url = Bundle.main.url(forResource: "logo", withExtension: "png")
-            ?? Bundle.module.url(forResource: "logo", withExtension: "png")
+            ?? Bundle(url: Bundle.main.bundleURL.appendingPathComponent("EasyTODO_EasyTODO.bundle"))?
+                .url(forResource: "logo", withExtension: "png")
 
         guard let url else {
             return nil

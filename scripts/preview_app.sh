@@ -61,7 +61,7 @@ if defaults read com.easytodo.EasyTODO >/dev/null 2>&1; then
 fi
 
 echo "Data backup: $BACKUP_DIR"
-if ! CONFIGURATION=debug VERSION=1.0.4 BUILD_NUMBER=10401 bash scripts/package_app.sh >> "$LOG_PATH" 2>&1; then
+if ! CONFIGURATION=debug VERSION="${VERSION:-1.1.0}" BUILD_NUMBER="${BUILD_NUMBER:-11001}" bash scripts/package_app.sh >> "$LOG_PATH" 2>&1; then
     tail -n 70 "$LOG_PATH"
     echo "Packaging failed. The data backup and installed app are unchanged." >&2
     exit 1
